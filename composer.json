@@ -1,0 +1,105 @@
+{
+    "name": "zambodaniel/sylius-barion-plugin",
+    "type": "sylius-barion-plugin",
+    "description": "Barion payment gateway plugin for Sylius.",
+    "keywords": [
+        "sylius",
+        "sylius-plugin",
+        "barion",
+        "payment-gateway"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Zambo",
+            "email": "zambodaniel@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3 || ^8.0",
+        "sylius/sylius": "^1.10 || ^1.11",
+        "barion/barion-web-php": "1.4.6",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "behat/behat": "^3.6.1",
+        "behat/mink-selenium2-driver": "^1.4",
+        "dmore/behat-chrome-extension": "^1.3",
+        "dmore/chrome-mink-driver": "^2.7",
+        "friends-of-behat/mink": "^1.8",
+        "friends-of-behat/mink-browserkit-driver": "^1.4",
+        "friends-of-behat/mink-extension": "^2.4",
+        "friends-of-behat/page-object-extension": "^0.3",
+        "friends-of-behat/suite-settings-extension": "^1.0",
+        "friends-of-behat/symfony-extension": "^2.1",
+        "friends-of-behat/variadic-extension": "^1.3",
+        "friendsofsymfony/oauth-server-bundle": "^1.6 || >2.0.0-alpha.0 ^2.0@dev",
+        "lakion/mink-debug-extension": "^2.0.0",
+        "phpspec/phpspec": "^7.0",
+        "phpstan/extension-installer": "^1.0",
+        "phpstan/phpstan": "0.12.74",
+        "phpstan/phpstan-doctrine": "0.12.31",
+        "phpstan/phpstan-strict-rules": "^0.12.0",
+        "phpstan/phpstan-webmozart-assert": "0.12.12",
+        "phpunit/phpunit": "^9.5",
+        "sensiolabs/security-checker": "^6.0",
+        "sylius-labs/coding-standard": "^3.1",
+        "symfony/browser-kit": "^4.4 || ^5.2",
+        "symfony/debug-bundle": "^4.4 || ^5.2",
+        "symfony/dotenv": "^4.4 || ^5.2",
+        "symfony/intl": "^4.4 || ^5.2",
+        "symfony/web-profiler-bundle": "^4.4 || ^5.2",
+        "vimeo/psalm": "4.4.1"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "ZamboDaniel\\SyliusBarionPlugin\\": "src/",
+            "Tests\\ZamboDaniel\\SyliusBarionPlugin\\": "tests/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/Application/Kernel.php"
+        ]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php bin/create_node_symlink.php"
+        ],
+        "post-update-cmd": [
+            "php bin/create_node_symlink.php"
+        ],
+        "post-create-project-cmd": [
+            "php bin/create_node_symlink.php"
+        ]
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "barion/barion-web-php",
+                "version": "1.4.6",
+                "dist": {
+                    "url": "https://github.com/barion/barion-web-php/archive/v1.4.6.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "https://github.com/barion/barion-web-php.git",
+                    "type": "git",
+                    "reference": "v1.4.6"
+                },
+                "autoload": {
+                    "classmap": [ "library/" ],
+                    "files": [
+                        "library/common/Constants.php",
+                        "library/BarionClient.php"
+                    ]
+                }
+            }
+        }
+
+    ]
+}
