@@ -11,6 +11,7 @@ use Payum\Core\Request\GetCurrency;
 use Payum\Core\Request\GetHumanStatus;
 use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use Payum\Core\Security\TokenInterface;
+use TransactionResponseModel;
 use ZamboDaniel\SyliusBarionPlugin\Payum\BarionApi;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
@@ -63,6 +64,13 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
                 $details['status'] = GetHumanStatus::STATUS_PENDING;
                 $details['paymentId'] = urldecode($response->PaymentId);
                 $details['paymentUrl'] = urldecode($response->PaymentRedirectUrl);
+                $details['TransactionId'] = null;
+                foreach ($response->Transactions as $transaction) {
+                    /** @var TransactionResponseModel $transaction */
+                    if ($transaction->POSTransactionId === $payment->getId()) {
+                        $details['TransactionId'] = $transaction->TransactionId;
+                    }
+                }
                 $payment->setDetails($details);
                 throw new HttpRedirect($details['paymentUrl']);
             }
