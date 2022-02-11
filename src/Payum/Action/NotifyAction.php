@@ -37,9 +37,11 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
         if (isset($details['paymentId']) && $details['paymentId']) {
             $response = $this->api->getPaymentState($details['paymentId']);
-            if ($response->RequestSuccessful) {
-                if('Succeeded' == $response->Status and $details['status'] === GetHumanStatus::STATUS_PENDING) {
-                    $details['status'] = GetHumanStatus::STATUS_CAPTURED;
+            if ($response->RequestSuccessful && $details['status'] === GetHumanStatus::STATUS_PENDING) {
+                switch ($response->Status) {
+                    case 'Succeeded':
+                        $details['status'] = GetHumanStatus::STATUS_CAPTURED;
+                        break;
                 }
                 throw new HttpResponse(null, Response::HTTP_OK);
             }

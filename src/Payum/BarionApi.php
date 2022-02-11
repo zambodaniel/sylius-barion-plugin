@@ -45,15 +45,27 @@ final class BarionApi
         return new \BarionClient($this->posKey, 2, $this->env);
     }
 
-    public function preparePayment(PaymentInterface $payment, float $total, string $redirectUrl, string $callbackUrl): \PreparePaymentResponseModel
+    public function preparePayment(PaymentInterface $payment, float $total, int $divisor, string $redirectUrl, string $callbackUrl): \PreparePaymentResponseModel
     {
         $transaction = new \PaymentTransactionModel();
         $transaction->POSTransactionId = $payment->getId();
         $transaction->Payee = $this->payee;
-        $transaction->Total = $total;
+        $transaction->Total = $total / $divisor;
+
+        foreach ($payment->getOrder()->getItems() as $orderItem) {
+            $item = new \ItemModel();
+            $item->Name = $orderItem->getVariantName() ?? $orderItem->getProductName();
+            $item->Description = $orderItem->getProduct()->getShortDescription() ?? $item->Name;
+            $item->Quantity = $orderItem->getQuantity();
+            $item->Unit = 'db';
+            $item->UnitPrice = $orderItem->getUnitPrice() / $divisor;
+            $item->ItemTotal = $orderItem->getTotal() / $divisor;
+            $item->SKU = $orderItem->getVariant()->getCode();
+            $transaction->AddItem($item);
+        }
 
         $paymentRequest = new \PreparePaymentRequestModel();
-        $paymentRequest->OrderNumber = $payment->getId();
+        $paymentRequest->OrderNumber = $payment->getOrder()->getNumber();
         $paymentRequest->PaymentRequestId = $payment->getId() . '-' . time();
         $paymentRequest->PayerHint = $payment->getOrder()->getCustomer()->getEmail();
         $paymentRequest->Locale = str_replace('_', '-', $payment->getOrder()->getLocaleCode());

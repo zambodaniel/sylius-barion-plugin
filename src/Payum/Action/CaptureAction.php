@@ -13,7 +13,6 @@ use Payum\Core\Request\GetHumanStatus;
 use Payum\Core\Security\GenericTokenFactoryAwareInterface;
 use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use Payum\Core\Security\TokenInterface;
-use TransactionResponseModel;
 use ZamboDaniel\SyliusBarionPlugin\Payum\BarionApi;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
@@ -55,7 +54,8 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
 
                 $response = $this->api->preparePayment(
                     $payment,
-                    $payment->getAmount() / $divisor,
+                    $payment->getAmount(),
+                    $divisor,
                     $request->getToken()->getTargetUrl(),
                     $details['notifyURL']
                 );
@@ -66,13 +66,6 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
                 $details['status'] = GetHumanStatus::STATUS_PENDING;
                 $details['paymentId'] = urldecode($response->PaymentId);
                 $details['paymentUrl'] = urldecode($response->PaymentRedirectUrl);
-                $details['TransactionId'] = null;
-                foreach ($response->Transactions as $transaction) {
-                    /** @var TransactionResponseModel $transaction */
-                    if ($transaction->POSTransactionId === $payment->getId()) {
-                        $details['TransactionId'] = $transaction->TransactionId;
-                    }
-                }
                 $payment->setDetails($details);
                 throw new HttpRedirect($details['paymentUrl']);
             }
@@ -82,8 +75,14 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
             }
         } elseif ($details['status'] === GetHumanStatus::STATUS_PENDING) {
             $response = $this->api->getPaymentState($details['paymentId']);
-            if ($response->RequestSuccessful && 'Succeeded' == $response->Status) {
-                $details['status'] = GetHumanStatus::STATUS_CAPTURED;
+            if ($response->RequestSuccessful) {
+                switch ($response->Status) {
+                    case 'Succeeded':
+                        $details['status'] = GetHumanStatus::STATUS_CAPTURED;
+                        break;
+                    case 'Canceled':
+                        $details['status'] = GetHumanStatus::STATUS_CANCELED;
+                }
             }
         }
         $payment->setDetails($details);
