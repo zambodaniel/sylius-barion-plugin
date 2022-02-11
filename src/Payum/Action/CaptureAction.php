@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace ZamboDaniel\SyliusBarionPlugin\Payum\Action;
 
 use Payum\Core\Exception\RequestNotSupportedException;
+use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\HttpRedirect;
 use Payum\Core\Request\GetCurrency;
 use Payum\Core\Request\GetHumanStatus;
+use Payum\Core\Security\GenericTokenFactoryAwareInterface;
 use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use Payum\Core\Security\TokenInterface;
 use TransactionResponseModel;
@@ -19,7 +21,7 @@ use Sylius\Component\Core\Model\PaymentInterface as SyliusPaymentInterface;
 use Payum\Core\Request\Capture;
 
 
-final class CaptureAction implements ActionInterface, ApiAwareInterface
+final class CaptureAction implements ActionInterface, ApiAwareInterface, GenericTokenFactoryAwareInterface, GatewayAwareInterface
 {
 
     use GatewayAwareTrait, GenericTokenFactoryAwareTrait, BarionApiTrait;
