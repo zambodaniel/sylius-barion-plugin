@@ -58,8 +58,8 @@ final class BarionApi
             $item->Description = $orderItem->getProduct()->getShortDescription() ?? $item->Name;
             $item->Quantity = $orderItem->getQuantity();
             $item->Unit = 'db';
-            $item->UnitPrice = $orderItem->getUnitPrice() / $divisor;
-            $item->ItemTotal = $orderItem->getTotal() / $divisor;
+            $item->UnitPrice = intval($orderItem->getUnitPrice() / $divisor);
+            $item->ItemTotal = intval($orderItem->getTotal() / $divisor);
             $item->SKU = $orderItem->getVariant()->getCode();
             $transaction->AddItem($item);
         }
