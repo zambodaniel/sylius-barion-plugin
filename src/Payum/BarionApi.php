@@ -50,7 +50,7 @@ final class BarionApi
         $transaction = new \PaymentTransactionModel();
         $transaction->POSTransactionId = $payment->getId();
         $transaction->Payee = $this->payee;
-        $transaction->Total = intval($total / $divisor);
+        $transaction->Total = intval(round($total / $divisor));
 
         foreach ($payment->getOrder()->getItems() as $orderItem) {
             $item = new \ItemModel();
