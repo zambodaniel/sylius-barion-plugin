@@ -37,16 +37,16 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
 
         /** @var SyliusPaymentInterface $payment */
         $payment = $request->getModel();
-        $details = $payment->getDetails();
+        $model = $payment->getDetails();
 
-        if (empty($details['status'])) {
+        if (empty($model['status'])) {
             try {
                 $notifyToken = $this->tokenFactory->createNotifyToken(
                     $token->getGatewayName(),
                     $token->getDetails()
                 );
-                $details['notifyToken'] = $notifyToken->getHash();
-                $details['notifyURL'] = $notifyToken->getTargetUrl();
+                $model['notifyToken'] = $notifyToken->getHash();
+                $model['notifyURL'] = $notifyToken->getTargetUrl();
 
                 $currency = new GetCurrency($payment->getCurrencyCode());
                 $this->gateway->execute($currency);
@@ -57,35 +57,35 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
                     $payment->getAmount(),
                     $divisor,
                     $request->getToken()->getTargetUrl(),
-                    $details['notifyURL']
+                    $model['notifyURL']
                 );
             } catch (\Exception $exception) {
-                $details['status'] = GetHumanStatus::STATUS_FAILED;
+                $model['status'] = GetHumanStatus::STATUS_FAILED;
             }
             if (isset($response) && $response->RequestSuccessful && 'Prepared' == $response->Status && $response->PaymentId) {
-                $details['status'] = GetHumanStatus::STATUS_PENDING;
-                $details['paymentId'] = urldecode($response->PaymentId);
-                $details['paymentUrl'] = urldecode($response->PaymentRedirectUrl);
-                $payment->setDetails($details);
-                throw new HttpRedirect($details['paymentUrl']);
+                $model['status'] = GetHumanStatus::STATUS_PENDING;
+                $model['paymentId'] = urldecode($response->PaymentId);
+                $model['paymentUrl'] = urldecode($response->PaymentRedirectUrl);
+                $payment->setDetails($model);
+                throw new HttpRedirect($model['paymentUrl']);
             }
-            $details['status'] = GetHumanStatus::STATUS_FAILED;
+            $model['status'] = GetHumanStatus::STATUS_FAILED;
             if (isset($response)) {
-                $details['errors'] = $response->Errors;
+                $model['errors'] = $response->Errors;
             }
-        } elseif ($details['status'] === GetHumanStatus::STATUS_PENDING) {
-            $response = $this->api->getPaymentState($details['paymentId']);
+        } elseif ($model['status'] === GetHumanStatus::STATUS_PENDING) {
+            $response = $this->api->getPaymentState($model['paymentId']);
             if ($response->RequestSuccessful) {
                 switch ($response->Status) {
                     case 'Succeeded':
-                        $details['status'] = GetHumanStatus::STATUS_CAPTURED;
+                        $model['status'] = GetHumanStatus::STATUS_CAPTURED;
                         break;
                     case 'Canceled':
-                        $details['status'] = GetHumanStatus::STATUS_CANCELED;
+                        $model['status'] = GetHumanStatus::STATUS_CANCELED;
                 }
             }
         }
-        $payment->setDetails($details);
+        $payment->setDetails($model);
 
     }
 
