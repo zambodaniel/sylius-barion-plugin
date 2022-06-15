@@ -54,6 +54,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
                         $model['status'] = GetHumanStatus::STATUS_EXPIRED;
                         break;
                 }
+                $request->setModel($model);
                 throw new HttpResponse('SUCCESS');
             } elseif (!empty($response->Errors)) {
                 /** @var \ApiErrorModel $error */

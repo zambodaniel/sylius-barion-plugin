@@ -12,6 +12,10 @@ use Sylius\Component\Core\Model\PaymentInterface as SyliusPaymentInterface;
 
 final class StatusAction implements ActionInterface
 {
+    /**
+     * @param GetStatusInterface $request
+     * @return void
+     */
     public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
@@ -39,6 +43,12 @@ final class StatusAction implements ActionInterface
                 break;
             case GetHumanStatus::STATUS_CANCELED:
                 $request->markCanceled();
+                break;
+            case GetHumanStatus::STATUS_EXPIRED:
+                $request->markExpired();
+                break;
+            case GetHumanStatus::STATUS_AUTHORIZED:
+                $request->markAuthorized();
                 break;
             default:
                 $request->markUnknown();
