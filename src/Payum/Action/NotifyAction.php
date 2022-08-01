@@ -44,8 +44,10 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
                 // Call ok
                 switch ($response->Status) {
                     case \PaymentStatus::Authorized:
-                    case \PaymentStatus::Succeeded:
                         $model['status'] = GetHumanStatus::STATUS_AUTHORIZED;
+                        break;
+                    case \PaymentStatus::Succeeded:
+                        $model['status'] = GetHumanStatus::STATUS_CAPTURED;
                         break;
                     case \PaymentStatus::Canceled:
                         $model['status'] = GetHumanStatus::STATUS_CANCELED;
